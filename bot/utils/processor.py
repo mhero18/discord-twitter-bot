@@ -69,7 +69,9 @@ def worth_posting_track(track, hashtags, text):
         if t.startswith("#"):
             if t[1:] in map(lambda x: x["text"], hashtags):
                 return True
-        elif t in text:
+        elif (t + ".info") in text:
+            return True
+        elif (t + '.info') in text:
             return True
     return False
 
