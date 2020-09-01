@@ -64,7 +64,7 @@ def worth_posting_location(location, coordinates):
     return False
 
 
-def worth_posting_track(track, hashtags, text):
+def worth_posting_track(track, hashtags, text, urls):
     for t in track:
         if t.startswith("#"):
             if t[1:] in map(lambda x: x["text"], hashtags):
@@ -73,6 +73,10 @@ def worth_posting_track(track, hashtags, text):
             return True
         elif (t + '.info') in text:
             return True
+        else:
+            for x in urls:
+                if (t + '.info') in x:
+                    return True
     return False
 
 
@@ -157,19 +161,23 @@ class Processor:
         )
 
     def worth_posting_track(self):
+        displayurls = []
         if "extended_tweet" in self.status_tweet:
             hashtags = sorted(
                 self.status_tweet["extended_tweet"]["entities"]["hashtags"],
                 key=lambda k: k["text"],
                 reverse=True,
             )
+            for url in self.status_tweet["extended_tweet"]["entities"]["urls"]:
+                displayurls.append(url["display_url"])
+                displayurls.append(url["expanded_url"])
         else:
             hashtags = sorted(
                 self.status_tweet["entities"]["hashtags"], key=lambda k: k["text"], reverse=True
             )
-
+        
         return worth_posting_track(
-            track=self.discord_config.get("track", []), hashtags=hashtags, text=self.text
+            track=self.discord_config.get("track", []), hashtags=hashtags, text=self.text, urls=displayurls
         )
 
     def worth_posting_follow(self):
