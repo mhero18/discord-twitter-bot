@@ -29,6 +29,7 @@ Installations have been written for:
 * [Heroku](http://nntin.github.io/discord-twitter-bot/docs/inst-heroku/)
 * [Docker](http://nntin.github.io/discord-twitter-bot/docs/inst-docker/)
 * [Raspbian](http://nntin.github.io/discord-twitter-bot/docs/inst-raspbian/)
+* [Hero Deploy](https://dashboard.heroku.com/new?button-url=https%3A%2F%2Fgithub.com%2Fmhero18%2Fdiscord-twitter-bot&template=https%3A%2F%2Fgithub.com%2Fmhero18%2Fdiscord-twitter-bot)
 
 # Configuration
 
