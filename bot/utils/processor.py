@@ -3,8 +3,13 @@ import re
 from discord import Webhook, RequestsWebhookAdapter, Embed
 import discord
 import random
+import tweepy
 from datetime import datetime
 
+try:
+    from config import config, auth
+except ModuleNotFoundError:
+    from bot.config import config, auth
 
 COLORS = [
     0x7F0000,
@@ -52,6 +57,7 @@ COLORS = [
     0x7C29A6,
 ]
 WH_REGEX = r"discord(app)?\.com\/api\/webhooks\/(?P<id>\d+)\/(?P<token>.+)"
+api = tweepy.API(auth)
 
 
 def worth_posting_location(location, coordinates):
@@ -345,6 +351,30 @@ class Processor:
             icon_url="https://cdn1.iconfinder.com/data/icons/iconza-circle-social/64/697029-twitter-512.png",
         )
 
+    def create_content(self):
+        message = ""
+        if "extended_tweet" in self.status_tweet:
+            hashtags = sorted(
+                self.status_tweet["extended_tweet"]["entities"]["hashtags"],
+                key=lambda k: k["text"],
+                reverse=True,
+            )
+        else:
+            hashtags = sorted(
+                self.status_tweet["entities"]["hashtags"], key=lambda k: k["text"], reverse=True
+            )
+        for hashtag in sorted(
+            self.status_tweet["entities"]["hashtags"], key=lambda k: k["text"], reverse=True
+        ):
+            message += "#%s" % hashtag["text"]
+            message += " "   
+        return message
+
+    def reply_tweet(self):
+        tweet_id=self.status_tweet["id"]
+        message = self.create_content()
+        api.update_status(status=message, in_reply_to_status_id = tweet_id, auto_populate_reply_metadata=True)
+
     def send_message(self, wh_url):
         match = re.search(WH_REGEX, wh_url)
 
@@ -354,7 +384,8 @@ class Processor:
             )
             try:
                 webhook.send(
-                    embed=self.embed, content=self.discord_config.get("custom_message", None)
+                    #embed=self.embed, content=self.discord_config.get("custom_message", None)
+                    embed=self.embed, content=self.create_content()
                 )
             except discord.errors.NotFound as error:
                 print(
