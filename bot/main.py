@@ -61,6 +61,15 @@ class StdOutListener(StreamListener):
                     data["user"]["screen_name"],
                     "twittered.",
                 )
+                
+                sleep(7)
+                p.reply_tweet()
+
+                print(
+                    strftime("[%Y-%m-%d %H:%M:%S]", gmtime()),
+                    data["user"]["screen_name"],
+                    "replied back.",
+                )
 
     def on_status(self, status):
         """Called when a new status arrives"""
