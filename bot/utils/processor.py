@@ -138,7 +138,9 @@ class Processor:
         self.status_tweet = status_tweet
         self.discord_config = discord_config
         self.text = ""
-        self.embed = None
+        self.embed1 = None
+        self.embed2 = None
+        self.embeds = []
 
     def worth_posting_location(self):
         if (
@@ -328,29 +330,6 @@ class Processor:
                     elif media["type"] == "animated_gif":
                         pass
 
-    def create_embed(self):
-        self.embed = Embed(
-            colour=random.choice(COLORS),
-            url="https://twitter.com/{}/status/{}".format(
-                self.status_tweet["user"]["screen_name"], self.status_tweet["id_str"]
-            ),
-            title=self.status_tweet["user"]["name"],
-            description=self.text,
-            timestamp=datetime.strptime(
-                self.status_tweet["created_at"], "%a %b %d %H:%M:%S +0000 %Y"
-            ),
-        )
-
-        self.embed.set_author(
-            name=self.status_tweet["user"]["screen_name"],
-            url="https://twitter.com/" + self.status_tweet["user"]["screen_name"],
-            icon_url=self.status_tweet["user"]["profile_image_url"],
-        )
-        self.embed.set_footer(
-            text="Tweet created on",
-            icon_url="https://cdn1.iconfinder.com/data/icons/iconza-circle-social/64/697029-twitter-512.png",
-        )
-
     def create_content(self):
         message = ""
         if "extended_tweet" in self.status_tweet:
@@ -370,6 +349,38 @@ class Processor:
             message += " "   
         return message
 
+    def create_embed(self):
+        self.embed1 = Embed(
+            colour=random.choice(COLORS),
+            url="https://twitter.com/{}/status/{}".format(
+                self.status_tweet["user"]["screen_name"], self.status_tweet["id_str"]
+            ),
+            title=self.status_tweet["user"]["name"],
+            description=self.text,
+            timestamp=datetime.strptime(
+                self.status_tweet["created_at"], "%a %b %d %H:%M:%S +0000 %Y"
+            ),
+        )
+
+        self.embed1.set_author(
+            name=self.status_tweet["user"]["screen_name"],
+            url="https://twitter.com/" + self.status_tweet["user"]["screen_name"],
+            icon_url=self.status_tweet["user"]["profile_image_url"],
+        )
+        self.embed1.set_footer(
+            text="Tweet created on",
+            icon_url="https://cdn1.iconfinder.com/data/icons/iconza-circle-social/64/697029-twitter-512.png",
+        )
+
+        self.embed2 = Embed(
+            colour=random.choice(COLORS),
+            title="Hashtags",
+            description=self.create_content()
+        )
+
+        self.embeds.append(self.embed1)
+        self.embeds.append(self.embed2)
+
     def reply_tweet(self):
         tweet_id=self.status_tweet["id"]
         message = self.create_content()
@@ -384,8 +395,7 @@ class Processor:
             )
             try:
                 webhook.send(
-                    #embed=self.embed, content=self.discord_config.get("custom_message", None)
-                    embed=self.embed, content=self.create_content()
+                    embeds=self.embeds, content=self.discord_config.get("custom_message", None)
                 )
             except discord.errors.NotFound as error:
                 print(
