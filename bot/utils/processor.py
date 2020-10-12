@@ -140,6 +140,7 @@ class Processor:
         self.text = ""
         self.embed1 = None
         self.embed2 = None
+        self.embed3 = None
         self.embeds = []
 
     def worth_posting_location(self):
@@ -372,19 +373,30 @@ class Processor:
             icon_url="https://cdn1.iconfinder.com/data/icons/iconza-circle-social/64/697029-twitter-512.png",
         )
 
+        content = self.create_content()
         self.embed2 = Embed(
             colour=random.choice(COLORS),
             title="Hashtags",
-            description=self.create_content()
+            description=content
+        )
+
+        content2 = content.replace("#", "%23")
+        content2 = content2.replace(" ", "%20")
+        self.embed3 = Embed(
+            colour=random.choice(COLORS),
+            title="Click here to tweet!",
+            url="https://twitter.com/intent/tweet?text={}".format(content2)
         )
 
         self.embeds.append(self.embed1)
         self.embeds.append(self.embed2)
+        self.embeds.append(self.embed3)
 
     def reply_tweet(self):
         tweet_id=self.status_tweet["id"]
         message = self.create_content()
-        api.update_status(status=message, in_reply_to_status_id = tweet_id, auto_populate_reply_metadata=True)
+        if message:
+            api.update_status(status=message, in_reply_to_status_id = tweet_id, auto_populate_reply_metadata=True)
 
     def send_message(self, wh_url):
         match = re.search(WH_REGEX, wh_url)
