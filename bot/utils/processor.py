@@ -138,7 +138,7 @@ class Processor:
         self.status_tweet = status_tweet
         self.discord_config = discord_config
         self.text = ""
-        self.embed1 = None
+        self.embed = None
         self.embed2 = None
         self.embed3 = None
         self.embeds = []
@@ -351,7 +351,7 @@ class Processor:
         return message
 
     def create_embed(self):
-        self.embed1 = Embed(
+        self.embed = Embed(
             colour=random.choice(COLORS),
             url="https://twitter.com/{}/status/{}".format(
                 self.status_tweet["user"]["screen_name"], self.status_tweet["id_str"]
@@ -363,12 +363,12 @@ class Processor:
             ),
         )
 
-        self.embed1.set_author(
+        self.embed.set_author(
             name=self.status_tweet["user"]["screen_name"],
             url="https://twitter.com/" + self.status_tweet["user"]["screen_name"],
             icon_url=self.status_tweet["user"]["profile_image_url"],
         )
-        self.embed1.set_footer(
+        self.embed.set_footer(
             text="Tweet created on",
             icon_url="https://cdn1.iconfinder.com/data/icons/iconza-circle-social/64/697029-twitter-512.png",
         )
@@ -388,7 +388,7 @@ class Processor:
             url="https://twitter.com/intent/tweet?text={}".format(content2)
         )
 
-        self.embeds.append(self.embed1)
+        self.embeds.append(self.embed)
         self.embeds.append(self.embed2)
         self.embeds.append(self.embed3)
 
